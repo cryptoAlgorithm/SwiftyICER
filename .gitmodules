@@ -1,0 +1,4 @@
+[submodule "Sources/ICERImpl/icer_compression"]
+	path = Sources/ICERImpl/icer_compression
+	url = git@github.com:cryptoAlgorithm/icer_compression.git
+	branch = fix-decode-encode-options
