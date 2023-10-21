@@ -31,23 +31,27 @@ class ICERModel: ObservableObject {
             guard case .rgb888(let r, let g, let b) = decoded.data else {
                 return
             }
-            let compBits = 8
             var rgb888 = Data()
+            rgb888.resetBytes(in: 0..<(r.count/2)*3)
+            let compBits = 8
             for i in 0..<r.count/2 {
-                rgb888.append(contentsOf: [r[i*2], g[i*2], b[i*2]])
+                rgb888[i*3] = r[i*2]
+                rgb888[i*3+1] = g[i*2]
+                rgb888[i*3+2] = b[i*2]
             }
 
             let providerRef = CGDataProvider(data: rgb888 as CFData)
+            let cgImage = CGImage(
+                width: decoded.width, height: decoded.height,
+                bitsPerComponent: compBits, bitsPerPixel: compBits*3, bytesPerRow: decoded.width*3,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
+                provider: providerRef!, decode: nil, shouldInterpolate: true, intent: .defaultIntent
+            )
+            // Store the resultant CGImage in a cache
+            // Self.decodeCache[raw.hashValue] = img
             DispatchQueue.main.async { [weak self] in
-                self?.decodedImg = CGImage(
-                    width: decoded.width, height: decoded.height,
-                    bitsPerComponent: compBits, bitsPerPixel: compBits*3, bytesPerRow: decoded.width*3,
-                    space: CGColorSpaceCreateDeviceRGB(),
-                    bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue),
-                    provider: providerRef!, decode: nil, shouldInterpolate: true, intent: .defaultIntent
-                )
-                // Store the resultant CGImage in a cache
-                Self.decodeCache[raw.hashValue] = self?.decodedImg
+                self?.decodedImg = cgImage
             }
         } else {
             DispatchQueue.main.async { [weak self] in self?.decodedImg = nil }
@@ -60,14 +64,15 @@ class ICERModel: ObservableObject {
         filter: icer_filter_types
     ) {
         decodeWorkItem?.cancel()
-        decodeWorkItem = nil
         decodeWorkItem = DispatchWorkItem { [unowned self] in
             print("Decoding")
             // If we have a stored CGImage in the cache, use that instead
-            if !ignoreCache, let cachedImg = Self.decodeCache[data.hashValue] {
+            // Cache is unnecessary with new throttling
+            /* if !ignoreCache, let cachedImg = Self.decodeCache[data.hashValue] {
+                print("Cached")
                 DispatchQueue.main.async { [unowned self] in decodedImg = cachedImg }
                 return
-            }
+            } */
 
             DispatchQueue.main.async { [unowned self] in rendering = true }
             _decode(raw: data, stages: st, segments: seg, filter: filter)
