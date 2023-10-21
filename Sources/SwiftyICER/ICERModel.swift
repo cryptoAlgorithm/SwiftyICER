@@ -64,6 +64,13 @@ class ICERModel: ObservableObject {
         filter: icer_filter_types
     ) {
         decodeWorkItem?.cancel()
+
+        // If data is empty, don't bother enqueueing a work item
+        guard !data.isEmpty else {
+            decodedImg = nil
+            return
+        }
+
         decodeWorkItem = DispatchWorkItem { [unowned self] in
             print("Decoding")
             // If we have a stored CGImage in the cache, use that instead
