@@ -84,7 +84,9 @@ public extension ICER {
         guard segments <= ICER_MAX_SEGMENTS else { throw DecodeError.invalidSegments }
 
         var w = 0, h = 0
-        let data: DecodedData.ImgData = try encoded.withUnsafeBytes { ptr in
+        // Make copy of data for decoding operation so as to not mutate original one
+        let enc = Data(encoded)
+        let data: DecodedData.ImgData = try enc.withUnsafeBytes { ptr in
             let encodedAddr = ptr.baseAddress!.assumingMemoryBound(to: UInt8.self)
             switch type {
             case .gray16:
