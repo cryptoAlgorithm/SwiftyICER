@@ -19,8 +19,12 @@ let package = Package(
             name: "SwiftyICER", dependencies: ["ICERImpl"]),
         .target(
             name: "ICERImpl",
+            sources: ["icer_compression/lib_icer"],
             cSettings: [
-                .headerSearchPath("icer_compression/lib_icer/inc")]),
+                .headerSearchPath("icer_compression/lib_icer/inc"),
+                .unsafeFlags(["-Wno-conversion"])
+            ]
+        ),
         .testTarget(
             name: "SwiftyICERTests",
             dependencies: ["SwiftyICER"]),
