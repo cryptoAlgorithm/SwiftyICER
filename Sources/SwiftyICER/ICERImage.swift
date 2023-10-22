@@ -9,16 +9,6 @@ import SwiftUI
 import Combine
 import ICERImpl
 
-public enum ICERFilter: UInt32 {
-    case filterA = 0
-    case filterB
-    case filterC
-    case filterD
-    case filterE
-    case filterF
-    case filterQ
-}
-
 public struct ICERImage: View, Equatable {
     let data: Data
     let stages: UInt8
