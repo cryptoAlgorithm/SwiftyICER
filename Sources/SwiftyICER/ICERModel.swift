@@ -81,9 +81,9 @@ class ICERModel: ObservableObject {
                 return
             } */
 
-            DispatchQueue.main.async { [unowned self] in rendering = true }
+            DispatchQueue.main.async { [weak self] in self?.rendering = true }
             _decode(raw: data, stages: st, segments: seg, filter: filter)
-            DispatchQueue.main.async { [unowned self] in rendering = false }
+            DispatchQueue.main.async { [weak self] in self?.rendering = false }
         }
         Self.decodeQueue.asyncAfter(deadline: .now() + .milliseconds(200), execute: decodeWorkItem!)
     }
