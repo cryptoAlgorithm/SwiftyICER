@@ -71,7 +71,7 @@ class ICERModel: ObservableObject {
             return
         }
 
-        decodeWorkItem = DispatchWorkItem { [unowned self] in
+        decodeWorkItem = DispatchWorkItem { [weak self] in
             print("Decoding")
             // If we have a stored CGImage in the cache, use that instead
             // Cache is unnecessary with new throttling
@@ -82,7 +82,7 @@ class ICERModel: ObservableObject {
             } */
 
             DispatchQueue.main.async { [weak self] in self?.rendering = true }
-            _decode(raw: data, stages: st, segments: seg, filter: filter)
+            self?._decode(raw: data, stages: st, segments: seg, filter: filter)
             DispatchQueue.main.async { [weak self] in self?.rendering = false }
         }
         Self.decodeQueue.asyncAfter(deadline: .now() + .milliseconds(200), execute: decodeWorkItem!)
