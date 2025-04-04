@@ -9,6 +9,7 @@
 #define color_util_h
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : X)
 
